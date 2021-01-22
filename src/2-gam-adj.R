@@ -46,7 +46,7 @@ for(i in urine.t1){
     print(i)
     print(j)
     res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset1"]])
-    res <- data.frame(X=i, Y=j, n = res_adj$n, fit=I(list(res_adj$fit)), dat=I(list(res_adj$dat)))
+    res <- data.frame(X=i, Y=j, fit=I(list(res_adj$fit)), dat=I(list(res_adj$dat)))
     H1_adj_models <- bind_rows(H1_adj_models, res)
   }
 }
