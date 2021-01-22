@@ -2,7 +2,6 @@ rm(list=ls())
 
 source(here::here("0-config.R"))
 devtools::install_github("washb-eed-substudies/washbgam", force=T)
-library(washbgam)
 
 d <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
 

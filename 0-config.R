@@ -21,9 +21,6 @@ library(cowplot)
 library(mgcv)
 #library(psych)
 
-
-source(here("src/0-gam-functions.R"))
-
 dropboxDir <- NULL
 if(dir.exists("C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/")){ 
   dropboxDir <- "C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/"
@@ -62,8 +59,12 @@ tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
                "#BCBD22","#17BECF")
 
 if(!require(faraway)){
-  install.packages("faraway")
+  install.packages("faraway") 
   library(faraway)
+}
+if(!require(washbgam)){
+  devtools::install_github("washb-eed-substudies/washbgam")
+  library(washbgam)
 }
 
 #save R package versions
