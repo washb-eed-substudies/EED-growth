@@ -1,7 +1,7 @@
 rm(list=ls())
 
 source(here::here("0-config.R"))
-#devtools::install_github("washb-eed-substudies/washbgam", force=T)
+devtools::install_github("washb-eed-substudies/washbgam", force=T)
 library(washbgam)
 
 d <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
@@ -14,21 +14,25 @@ covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growt
 
 #baseline covariates
 Wvars <- covariates[c(43:57),2]
-Wvars[!(Wvars %in% colnames(d))]
 
 #timevarying covariates
 timecov <- covariates[c(1:40),c(2,8:19)]
+
+#obtain unique adjustment sets
 timecov <- unique(timecov)
+
+#make blank cells NAs
 timecov <- timecov %>% na_if("")
 
+#create adjustment set vectors
 cov.list <- vector('list', nrow(timecov))
 for(i in 1:length(cov.list)){
-  vec <- as.character(timecov[i,2:13])
-  vec <- append(vec, Wvars)
-  vec <- vec[!is.na(vec)]
-  cov.list[[i]] <- vec
+  vec <- as.character(timecov[i,2:13]) # create vector using row i in columns with variable names
+  vec <- append(vec, Wvars) #add baseline characteristics
+  vec <- vec[!is.na(vec)] #remove any NAs (from blank cells)
+  cov.list[[i]] <- vec #insert into list item i
 }
-names(cov.list) <- paste0('adjset', seq_along(cov.list))
+names(cov.list) <- paste0('adjset', seq_along(cov.list)) #rename 
 
 urine.t1 <- c("ln_L_conc_t1", "ln_M_conc_t1")
 stool.t1 <- c("ln_mpo1", "ln_aat1", "ln_neo1")
