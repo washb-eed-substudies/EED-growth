@@ -1,19 +1,15 @@
 rm(list=ls())
 
-source(here::here("0-config.R"))
-devtools::install_github("washb-eed-substudies/washbgam", force=T)
+source(here::here("1-data cleaning.R"))
+#remotes::install_github('washb-eed-substudies/washbgam')
 library(washbgam)
-
-d <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
-
-wealth <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/real_ids_hhwealth_quart.csv"))
-d <- left_join(d, wealth, by = c("dataid", "clusterid", "block"))
 
 #Make vectors of adjustment variable names
 covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
 
 #baseline covariates
 Wvars <- covariates[c(43:57),2]
+Wvars <- Wvars[-12]
 
 #timevarying covariates
 timecov <- covariates[c(1:40),c(2,8:19)]
@@ -30,9 +26,14 @@ for(i in 1:length(cov.list)){
   vec <- as.character(timecov[i,2:13]) # create vector using row i in columns with variable names
   vec <- append(vec, Wvars) #add baseline characteristics
   vec <- vec[!is.na(vec)] #remove any NAs (from blank cells)
+  vec <- sub("z_t1", "z_t1_cov", vec)
+  vec <- sub("z_t2", "z_t2_cov", vec)
+  vec <- sub("z_t3", "z_t3_cov", vec)
   cov.list[[i]] <- vec #insert into list item i
 }
 names(cov.list) <- paste0('adjset', seq_along(cov.list)) #rename 
+
+
 
 urine.t1 <- c("ln_L_conc_t1", "ln_M_conc_t1")
 stool.t1 <- c("ln_mpo1", "ln_aat1", "ln_neo1")
@@ -57,7 +58,6 @@ whz.t3 <- "whz_t3"
 velo.t1.t2 <- c("len_velocity_t1_t2", "wei_velocity_t1_t2", "hc_velocity_t1_t2")
 velo.t1.t3 <- c("len_velocity_t1_t3", "wei_velocity_t1_t3", "hc_velocity_t1_t3")
 velo.t2.t3 <- c("len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3")
-
 
 ###### Analysis
 #hypothesis 1
