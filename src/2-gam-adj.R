@@ -1,7 +1,7 @@
 rm(list=ls())
 
 source(here::here("1-data cleaning.R"))
-#remotes::install_github('washb-eed-substudies/washbgam')
+#remotes::install_github('washb-eed-substudies/washbgam', force = TRUE)
 library(washbgam)
 
 #Make vectors of adjustment variable names
@@ -272,7 +272,7 @@ for(i in urine.t1){
 
 #analysis 19
 for(i in stool.t1){
-  for(j in whz.t1){
+  for(j in whz.t2){
     print(i)
     print(j)
     res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset19"]])
@@ -283,7 +283,7 @@ for(i in stool.t1){
 
 #analysis 20
 for(i in urine.t1){
-  for(j in whz.t1){
+  for(j in whz.t2){
     print(i)
     print(j)
     res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset20"]])
@@ -556,23 +556,20 @@ for(i in 1:nrow(H5_adj_models)){
 
 
 #BH procedure
-H1_adj_res_BH <- H1_adj_res %>% group_by(Y) %>% 
+H1_adj_res_BH <- H1_adj_res %>%  
   mutate(corrected.Pval=p.adjust(Pval, method="BH")) %>%
-  ungroup() %>%
   as.data.frame()
 
 H2.H3_adj_res <- rbind(H2_adj_res, H3_adj_res)
 
-H2.H3_adj_res_BH <- H2.H3_adj_res %>% group_by(Y) %>% 
+H2.H3_adj_res_BH <- H2.H3_adj_res %>% 
   mutate(corrected.Pval=p.adjust(Pval, method="BH")) %>%
-  ungroup() %>%
   as.data.frame()
 
 H4.H5_adj_res <- rbind(H4_adj_res, H5_adj_res)
 
-H4.H5_adj_res_BH <- H4.H5_adj_res %>% group_by(Y) %>% 
+H4.H5_adj_res_BH <- H4.H5_adj_res %>% 
   mutate(corrected.Pval=p.adjust(Pval, method="BH")) %>%
-  ungroup() %>%
   as.data.frame()
 
 H2_adj_res_BH <- H2.H3_adj_res_BH[1:nrow(H2_adj_res),]
@@ -580,3 +577,76 @@ H3_adj_res_BH <- H2.H3_adj_res_BH[(nrow(H2_adj_res)+1):nrow(H2.H3_adj_res_BH),]
 
 H4_adj_res_BH <- H4.H5_adj_res_BH[1:nrow(H4_adj_res),]
 H5_adj_res_BH <- H4.H5_adj_res_BH[(nrow(H4_adj_res)+1):nrow(H4.H5_adj_res_BH),]
+
+saveRDS(H1_adj_res_BH, here("results/adjusted/H1_adj_res.RDS"))
+saveRDS(H2_adj_res_BH, here("results/adjusted/H2_adj_res.RDS"))
+saveRDS(H3_adj_res_BH, here("results/adjusted/H3_adj_res.RDS"))
+saveRDS(H4_adj_res_BH, here("results/adjusted/H4_adj_res.RDS"))
+saveRDS(H5_adj_res_BH, here("results/adjusted/H5_adj_res.RDS"))
+
+###### Effect Modification Analysis
+V.set.t1 <- c("life_viol_any_t3")
+V.set.t2 <- c("cesd_sum_t2", "life_viol_any_t3")
+V.set.t3 <- c("pss_sum_mom_t3", "cesd_sum_ee_t3", "life_viol_any_t3")
+V.set.t1.t2 <- c("cesd_sum_t2", "life_viol_any_t3")
+V.set.t2.t3 <- c("pss_sum_mom_t3","cesd_sum_t2", "cesd_sum_ee_t3", "life_viol_any_t3")
+V.set.t1.t3 <- c("pss_sum_mom_t3", "cesd_sum_t2", "cesd_sum_ee_t3", "life_viol_any_t3")
+EMM_models <- NULL
+
+#analysis 1
+for(i in urine.t1){
+  for(j in all.growth.t1){
+    for (k in V.set.t1){
+      print(i)
+      print(j)
+      print(k)
+      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset1"]], V = k)
+      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
+      EMM_models <- bind_rows(EMM_models, res)
+    }
+  }
+}
+
+#analysis 2
+for(i in stool.t1){
+  for(j in all.growth.t1){
+    for (k in V.set.t1){
+      print(i)
+      print(j)
+      print(k)
+      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset2"]], V = k)
+      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
+      EMM_models <- bind_rows(EMM_models, res)
+    }
+  }
+}
+
+#analysis 3
+for(i in stool.t2){
+  for(j in laz.waz.t2){
+    for (k in V.set.t2){
+      print(i)
+      print(j)
+      print(k)
+      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset3"]], V = k)
+      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
+      EMM_models <- bind_rows(EMM_models, res)
+    }
+  }
+}
+
+#analysis 4
+for(i in urine.t2){
+  for(j in laz.waz.t2){
+    for (k in V.set.t2){
+      print(i)
+      print(j)
+      print(k)
+      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset4"]], V = k)
+      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
+      EMM_models <- bind_rows(EMM_models, res)
+    }
+  }
+}
+
+## add the rest of the models
