@@ -53,7 +53,9 @@ d <- d %>%
   mutate(Nlt18 = ifelse(Nlt18 > 4 & !is.na(Nlt18), ">4", Nlt18))
 
 d <- d %>%
-  mutate(birthord = ifelse(birthord > 4 & !is.na(Nlt18), ">4", birthord))
+  mutate(birthord = ifelse(birthord == 1 & !is.na(Nlt18), "First Born", 
+                           ifelse(birthord > 1 & !is.na(Nlt18), "Secord Born or Higher", 
+                                  birthord)))
 
 #Z-score momheight and turn into a factor variable
 d <- d %>%
