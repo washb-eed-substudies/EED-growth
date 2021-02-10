@@ -24,7 +24,7 @@ d <- left_join(d, wealth, by = c("dataid", "clusterid", "block"))
 
 #create vector of names of adjustment variables - I am using the original table I made and distilling it down to a vector of unique names, but you can also manually type in all of the covariates that you need
 covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
-w.vars <- covariates[43:57, 2]
+w.vars <- covariates[c(55:69),1]
 time.cov <- covariates[,8:19]
 time.cov <- as.vector(as.matrix(time.cov))
 time.cov <- unique(time.cov)
@@ -32,7 +32,7 @@ time.cov <- time.cov[time.cov != ""]
 w.vars <- c(w.vars, time.cov)
 
 #create table of missingness and class of all variables
-d2 <- d %>% select(all_of(w.vars))                       
+d2 <- d %>% select(any_of(w.vars))                 
 miss <- data.frame(name = names(d2), missing = colSums(is.na(d2)), row.names = c(1:ncol(d2)))
 for (i in 1:nrow(miss)) {
   miss$class[i] <- class(d2[,which(colnames(d2) == miss[i, 1])])
@@ -66,7 +66,7 @@ d <- d %>%
                         include.lowest = TRUE))
 
 #redo missing table to get new classes
-d2 <- d %>% select(all_of(w.vars))   
+d2 <- d %>% select(any_of(w.vars))   
 miss <- data.frame(name = names(d2), missing = colSums(is.na(d2)), row.names = c(1:ncol(d2)))
 for (i in 1:nrow(miss)) {
   miss$class[i] <- class(d2[,which(colnames(d2) == miss[i, 1])])
@@ -105,9 +105,10 @@ growth.var <- grep("z_", names(d2), value = "TRUE")
 
 #create separate growth covariate variables to categorize (need to do if your outcome is growth)
 for (i in growth.var){
-  d[paste(i,"_cov", sep="")] <- d[i] 
+  d[paste(i,"_cat", sep="")] <- d[i] 
 }
-growth.cat <- grep("_cov", names(d), value = "TRUE")
+growth.cat <- grep("_cat", names(d), value = "TRUE")
+growth.cat <- growth.cat[-1]
 
 #use meaningful cut points and create factor variable with missingness level
 for (i in growth.cat) {
