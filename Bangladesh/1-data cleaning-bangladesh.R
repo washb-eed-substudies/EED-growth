@@ -16,14 +16,14 @@ library(dplyr)
 library(ggplot2)
 
 #read in dataset
-d <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
+d <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
 
 #join in wealth data (if necessary)
-wealth <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/real_ids_hhwealth_quart.csv"))
+wealth <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/real_ids_hhwealth_quart.csv"))
 d <- left_join(d, wealth, by = c("dataid", "clusterid", "block"))
 
 #create vector of names of adjustment variables - I am using the original table I made and distilling it down to a vector of unique names, but you can also manually type in all of the covariates that you need
-covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
+covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
 w.vars <- covariates[c(55:69),1]
 time.cov <- covariates[,8:19]
 time.cov <- as.vector(as.matrix(time.cov))
@@ -39,8 +39,8 @@ for (i in 1:nrow(miss)) {
 }
 
 #visualize and inspect distributions
-ExpCatViz(d2)
-ExpNumViz(d2)
+#ExpCatViz(d2)
+#ExpNumViz(d2)
 
 #keep age variables, birth order, and Nlt18 as numeric
 num.var <- c("birthord", "Nlt18", grep("age", names(d2), value = TRUE), 
@@ -54,8 +54,8 @@ d <- d %>%
   mutate(Nlt18 = ifelse(Nlt18 > 4 & !is.na(Nlt18), ">4", Nlt18))
 
 d <- d %>%
-  mutate(birthord = ifelse(birthord == 1 & !is.na(Nlt18), "First Born", 
-                           ifelse(birthord > 1 & !is.na(Nlt18), "Secord Born or Higher", 
+  mutate(birthord = ifelse(birthord == 1 & !is.na(birthord), "First Born", 
+                           ifelse(birthord > 1 & !is.na(birthord), "Secord Born or Higher", 
                                   birthord)))
 
 #Z-score momheight and turn into a factor variable
