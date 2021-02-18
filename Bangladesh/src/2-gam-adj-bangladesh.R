@@ -5,11 +5,11 @@ source(here::here("Bangladesh/1-data cleaning-Bangladesh.R"))
 library(washbgam)
 
 #Make vectors of adjustment variable names
-covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
+covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
 
 #baseline covariates
-w.vars <- covariates[c(55:69),1]
-w.vars <- w.vars[-12]
+w.vars <- covariates[c(44:58),1]
+w.vars <- w.vars[-12] #remove roof which has no variation
 
 #timevarying covariates
 time.cov <- covariates[c(1:40),c(2,8:19)]
