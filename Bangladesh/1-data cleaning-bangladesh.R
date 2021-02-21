@@ -23,13 +23,20 @@ wealth <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitl
 d <- left_join(d, wealth, by = c("dataid", "clusterid", "block"))
 
 #create vector of names of adjustment variables - I am using the original table I made and distilling it down to a vector of unique names, but you can also manually type in all of the covariates that you need
-covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
-w.vars <- covariates[c(55:69),1]
+covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"), na.strings=c(""))
+
+baseline.cov <- covariates[c(44:58),1]
+baseline.cov <- baseline.cov[!is.na(baseline.cov)]
+
 time.cov <- covariates[,8:19]
 time.cov <- as.vector(as.matrix(time.cov))
 time.cov <- unique(time.cov)
-time.cov <- time.cov[time.cov != ""]
-w.vars <- c(w.vars, time.cov)
+time.cov <- time.cov[!is.na(time.cov)]
+
+w.vars <- c(baseline.cov, time.cov)
+w.vars[!(w.vars %in% colnames(d))]
+
+w.vars <- w.vars[!w.vars %in% (grep("cat", w.vars, value = TRUE))]
 
 #create table of missingness and class of all variables
 d2 <- d %>% select(any_of(w.vars))                 
@@ -65,6 +72,11 @@ d <- d %>%
                          c(min(momheight, na.rm = T), -2, -1, 0, 1, 2, max(momheight, na.rm = T)),
                         right = FALSE,
                         include.lowest = TRUE))
+
+#convert pss and cesd at t3 to quantiles
+d$pss_sum_mom_t3 <- as.character(cut(d$pss_sum_mom_t3, breaks = 5))
+
+d$cesd_sum_ee_t3 <- as.character(cut(d$cesd_sum_ee_t3, breaks = 5))
 
 #redo missing table to get new classes
 d2 <- d %>% select(any_of(w.vars))   
