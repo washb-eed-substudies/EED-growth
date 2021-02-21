@@ -74,9 +74,11 @@ d <- d %>%
                         include.lowest = TRUE))
 
 #convert pss and cesd at t3 to quantiles
-d$pss_sum_mom_t3 <- as.character(cut(d$pss_sum_mom_t3, breaks = 5))
+pss.quartile <- quantile(d$pss_sum_mom_t3, probs = c(0.25, 0.5, 0.75, 1), na.rm = TRUE)
+d$pss_sum_mom_t3 <- as.character(cut(d$pss_sum_mom_t3, breaks = pss.quartile))
 
-d$cesd_sum_ee_t3 <- as.character(cut(d$cesd_sum_ee_t3, breaks = 5))
+cesd.quartile <- quantile(d$cesd_sum_ee_t3, probs = c(0.25, 0.5, 0.75, 1), na.rm = TRUE)
+d$cesd_sum_ee_t3 <- as.character(cut(d$cesd_sum_ee_t3, breaks = cesd.quartile))
 
 #redo missing table to get new classes
 d2 <- d %>% select(any_of(w.vars))   
