@@ -213,6 +213,11 @@ factor.var <- append(factor.var, grep("month", names(d2), value = TRUE))
 
 for (i in factor.var) {
   d[[i]] <- as.factor(d[[i]])
+}
+
+#remove factor vars with small number of missingness to avoid data sparsity
+factor.var <- factor.var[factor.var %in% c("birthord", "HHS", "Nlt18")]
+for (i in factor.var) {
   d[[i]] <- fct_explicit_na(d[[i]], "Missing")
 }
 
