@@ -19,7 +19,7 @@ library(ggplot2)
 d <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
 
 #join in wealth data (if necessary)
-wealth <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/real_ids_hhwealth_quart.csv"))
+wealth <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Audrie/hhwealth.csv"))
 d <- left_join(d, wealth, by = c("dataid", "clusterid", "block"))
 
 #create vector of names of adjustment variables - I am using the original table I made and distilling it down to a vector of unique names, but you can also manually type in all of the covariates that you need
