@@ -20,7 +20,7 @@ d <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/ba
 
 #join in wealth data (if necessary)
 wealth <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Audrie/hhwealth.csv"))
-d <- left_join(d, wealth, by = c("dataid", "clusterid", "block"))
+d <- left_join(d, wealth, by = c("dataid"))
 
 #create vector of names of adjustment variables - I am using the original table I made and distilling it down to a vector of unique names, but you can also manually type in all of the covariates that you need
 covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"), na.strings=c(""))
