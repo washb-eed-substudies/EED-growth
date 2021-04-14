@@ -75,3 +75,47 @@ tbl2 <- rbind(tbl2, tbls(exp.var = exp.t3, exp.names = exp.t3.names,
 
 #### SAVE TABLES ####
 write.csv(tbl2, file="~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables.csv")
+
+##word doc
+tbls.word <- function(exp.var = NULL, out.var = NULL, exp.names = NULL, out.names = NULL, tbl.name = NULL){
+  exposure <- exp.var
+  outcome <- out.var
+  expo_var <- exp.names
+  out_var <- out.names
+  
+  comb.table <- growth_tbl_flex(tbl.name, expo_var, out_var, exposure, outcome, 
+                                all_unadj, all_adj, T)
+  return(comb.table)
+}
+
+tbl1 <- tbls.word(exp.var = exp.t1, exp.names = exp.t1.names,
+             out.var = c(out.t2, out.t3), out.names = c(out.t2.names, out.t3.names), 
+             tbl.name = "EED markers at 3 months and Subsequent LAZ")
+
+tbl2 <- tbls.word(exp.var = exp.t1, exp.names = exp.t1.names,
+                         out.var =  c(velo.t1.t2, velo.t1.t3, velo.t2.t3),
+                         out.names = c(velo.t1.t2.names, velo.t1.t3.names, velo.t2.t3.names), 
+                         tbl.name = "EED markers at 3 months and Length velocity")
+
+tbl3 <- tbls.word(exp.var = exp.t2, exp.names = exp.t2.names,
+                         out.var = out.t3, out.names = out.t3.names, 
+                         tbl.name = "EED markers at 14 months and Subsequent LAZ")
+
+tbl4 <- tbls.word(exp.var = exp.t2, exp.names = exp.t2.names,
+                         out.var = c("len_velocity_t2_t3"), out.names = c("Length velocity 14-28 months"), 
+                         tbl.name = "EED markers at 14 months and Length velocity")
+
+tbl5 <- tbls.word(exp.var = exp.t1, exp.names = exp.t1.names,
+                         out.var = out.t1, out.names = out.t1.names, 
+                         tbl.name = "EED markers and concurrent growth")
+
+tbl6 <- tbls.word(exp.var = exp.t2, exp.names = exp.t2.names,
+                         out.var = out.t2, out.names = out.t2.names, 
+                         tbl.name = "EED markers and concurrent growth")
+
+tbl7 <- tbls.word(exp.var = exp.t3, exp.names = exp.t3.names,
+                         out.var = out.t3, out.names = out.t3.names, 
+                         tbl.name = "EED markers and concurrent growth")
+
+save_as_docx(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6, tbl7, 
+             path = "~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables.docx")
