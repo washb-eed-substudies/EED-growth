@@ -5,8 +5,18 @@ source(here::here("Bangladesh/1-data cleaning-bangladesh.R"))
 library(washbgam)
 
 stress<-readRDS(paste0(dropboxDir, "Data/Cleaned/Andrew/stress_growth_data.RDS"))
-stress<- stress %>% select(childid, grep("t2_f2", names(stress)), grep("cort", names(stress)))
+stress<- stress %>% select(childid, grep("t2_f2", names(stress)), t2_iso_pca, grep("cort", names(stress)))
 d<-d %>% left_join(stress, by="childid")
+
+maternal<-read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/washb-bd-pregnancy-serum-micronutrient-immun-cortisol-covariates.csv")) %>%
+  select(dataid, ln_preg_cort)
+d<-d %>% left_join(maternal, by="dataid")
+
+# exclude missing category from life_viol_any_t3 
+d$life_viol_any_t3 <- factor(d$life_viol_any_t3, exclude = "Missing")
+d$life_viol_any_t3 <- as.numeric(levels(d$life_viol_any_t3))[d$life_viol_any_t3]
+
+d$pss_sum_dad_t3 <- as.numeric(d$pss_sum_dad_t3)
 
 #Make vectors of adjustment variable names
 covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
@@ -58,18 +68,18 @@ velo.t1.t2 <- c("len_velocity_t1_t2", "wei_velocity_t1_t2", "hc_velocity_t1_t2")
 velo.t1.t3 <- c("len_velocity_t1_t3", "wei_velocity_t1_t3", "hc_velocity_t1_t3")
 velo.t2.t3 <- c("len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3")
 
-V.set.t1 <- c("life_viol_any_t3")
-V.set.t2 <- c("cesd_sum_t2", "life_viol_any_t3")
+V.set.t1 <- c("ln_preg_cort", "life_viol_any_t3")
+V.set.t2 <- c("t2_iso_pca", "cesd_sum_t2", "life_viol_any_t3")
 V.set.t3 <- c("pss_sum_mom_t3_cont", "pss_sum_dad_t3", 
               "cesd_sum_ee_t3_cont", "life_viol_any_t3", 
-              "t3_cort_slope", "t3_cort_z01", "t3_cort_z01")
-V.set.t1.t2 <- c("cesd_sum_t2", "life_viol_any_t3")
-V.set.t2.t3 <- c("pss_sum_mom_t3_cont","pss_sum_dad_t3",
+              "t3_cort_slope", "t3_cort_z01", "t3_cort_z03")
+V.set.t1.t2 <- c("ln_preg_cort", "t2_iso_pca", "cesd_sum_t2", "life_viol_any_t3")
+V.set.t2.t3 <- c("t2_iso_pca", "pss_sum_mom_t3_cont","pss_sum_dad_t3",
                  "cesd_sum_t2", "cesd_sum_ee_t3_cont", "life_viol_any_t3",
-                 "t3_cort_slope", "t3_cort_z01", "t3_cort_z01")
-V.set.t1.t3 <- c("pss_sum_mom_t3_cont", "pss_sum_dad_t3",
+                 "t3_cort_slope", "t3_cort_z01", "t3_cort_z03")
+V.set.t1.t3 <- c("ln_preg_cort", "t2_iso_pca", "pss_sum_mom_t3_cont", "pss_sum_dad_t3",
                  "cesd_sum_t2", "cesd_sum_ee_t3_cont", "life_viol_any_t3",
-                 "t3_cort_slope", "t3_cort_z01", "t3_cort_z01")
+                 "t3_cort_slope", "t3_cort_z01", "t3_cort_z03")
 
 ###### Analysis
 gam.analysis <- function(save, Xvar = NULL, Yvar = NULL, data = d, Wvar = NULL, Vvar = NULL){
@@ -141,15 +151,14 @@ EMM_models_t1v <- gam.analysis(EMM_models_t1v, urine.t1, velo.t1.t3, d, cov.list
 EMM_models_t1v <- gam.analysis(EMM_models_t1v, stool.t1, velo.t2.t3, d, cov.list[["adjset33"]], V.set.t1.t3) #37
 EMM_models_t1v <- gam.analysis(EMM_models_t1v, urine.t1, velo.t2.t3, d, cov.list[["adjset34"]], V.set.t1.t3) #38
 
-EMM_models_t2v <- gam.analysis(EMM_models_t2v, stool.t2, velo.t2.t3, d,cov.list[["adjset31"]], V.set.t1.t3) #39
-EMM_models_t2v <- gam.analysis(EMM_models_t2v, urine.t2, velo.t2.t3, d, cov.list[["adjset32"]], V.set.t1.t3) #40
+EMM_models_t2v <- gam.analysis(EMM_models_t2v, stool.t2, velo.t2.t3, d,cov.list[["adjset31"]], V.set.t2.t3) #39
+EMM_models_t2v <- gam.analysis(EMM_models_t2v, urine.t2, velo.t2.t3, d, cov.list[["adjset32"]], V.set.t2.t3) #40
 
 
 gam.results <- function(models, save){
   for(i in 1:nrow(models)){
     preds <- predict_gam_emm(fit=models$fit[i][[1]], d=models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=models$X[i], Yvar=models$Y[i])
     gamm_diff_res <- data.frame(V=models$V[i] , preds$res)
-    gamm_diff_res <- gamm_diff_res %>% mutate(Vlevel = as.character(Vlevel))
     save <-  bind_rows(save, gamm_diff_res)
   }
   save
@@ -172,6 +181,19 @@ res_t1v <- gam.results(EMM_models_t1v, res_t1v) %>% mutate(G = 6)
 res_t2v <- gam.results(EMM_models_t2v, res_t2v) %>% mutate(G = 7)
 
 total <- rbind(res_t1C, res_t2C, res_t3C, res_t1S, res_t2S, res_t1v, res_t2v)
+total <- total %>% group_by(G) %>% 
+  mutate(BH.Pval=p.adjust(Pval, method="BH")) %>%
+  ungroup() %>%
+  as.data.frame()
+
+res_t1C <- res_t1C %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+res_t2C <- res_t2C %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+res_t3C <- res_t3C %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+res_t1S <- res_t1S %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+res_t2S <- res_t2S %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+res_t1v <- res_t1v %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+res_t2v <- res_t2v %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+
 saveRDS(total, here("Bangladesh/results/EMM/all_results.RDS"))
 saveRDS(res_t1C, here("Bangladesh/results/EMM/res_t1C.RDS"))
 saveRDS(res_t2C, here("Bangladesh/results/EMM/res_t2C.RDS"))
@@ -181,17 +203,3 @@ saveRDS(res_t2S, here("Bangladesh/results/EMM/res_t2S.RDS"))
 saveRDS(res_t1v, here("Bangladesh/results/EMM/res_t1v.RDS"))
 saveRDS(res_t2v, here("Bangladesh/results/EMM/res_t2v.RDS"))
 
-all.splits.EMM <- list(NA)
-all.splits.EMM[[1]] <- EMM_models[1:20,]
-all.splits.EMM[[2]] <- EMM_models[21:68,]
-all.splits.EMM[[3]] <- EMM_models[69:128,]
-total.EMM <- NA
-for (i in 1:length(all.splits.EMM)) {
-  all.splits.EMM[[i]] <- all.splits.EMM[[i]] %>%
-    mutate(corrected.Pval=p.adjust(V.1, method="BH")) %>%
-    as.data.frame()
-
-  total.EMM <- rbind(total.EMM, all.splits.EMM[[i]])
-}
-total.EMM <- total.EMM[-1,]
-total.EMM <- total.EMM %>% arrange(corrected.Pval)
