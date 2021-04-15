@@ -16,14 +16,14 @@ library(dplyr)
 library(ggplot2)
 
 #read in dataset
-d <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
+d <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
 
 #join in wealth data (if necessary)
-wealth <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Audrie/hhwealth.csv"))
+wealth <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Audrie/hhwealth.csv"))
 d <- left_join(d, wealth, by = c("dataid"))
 
 #create vector of names of adjustment variables - I am using the original table I made and distilling it down to a vector of unique names, but you can also manually type in all of the covariates that you need
-covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"), na.strings=c(""))
+covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"), na.strings=c(""))
 
 baseline.cov <- covariates[c(44:58),1]
 baseline.cov <- baseline.cov[!is.na(baseline.cov)]
@@ -75,9 +75,11 @@ d <- d %>%
 
 #convert pss and cesd at t3 to quantiles
 pss.quartile <- quantile(d$pss_sum_mom_t3, probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
+d$pss_sum_mom_t3_cont <- d$pss_sum_mom_t3
 d$pss_sum_mom_t3 <- as.character(cut(d$pss_sum_mom_t3, breaks = pss.quartile))
 
 cesd.quartile <- quantile(d$cesd_sum_ee_t3, probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
+d$cesd_sum_ee_t3_cont <- d$cesd_sum_ee_t3
 d$cesd_sum_ee_t3 <- as.character(cut(d$cesd_sum_ee_t3, breaks = cesd.quartile))
 
 #redo missing table to get new classes
