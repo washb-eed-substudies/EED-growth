@@ -158,7 +158,7 @@ EMM_models_t2v <- gam.analysis(EMM_models_t2v, urine.t2, velo.t2.t3, d, cov.list
 gam.results <- function(models, save){
   for(i in 1:nrow(models)){
     preds <- predict_gam_emm(fit=models$fit[i][[1]], d=models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=models$X[i], Yvar=models$Y[i])
-    gamm_diff_res <- data.frame(V=models$V[i] , preds$res)
+    gamm_diff_res <- data.frame(V=models$V[i] , preds$res) %>% mutate(int.Pval = c(NA, models$int.p[[i]]))
     save <-  bind_rows(save, gamm_diff_res)
   }
   save
@@ -183,16 +183,25 @@ res_t2v <- gam.results(EMM_models_t2v, res_t2v) %>% mutate(G = 7)
 total <- rbind(res_t1C, res_t2C, res_t3C, res_t1S, res_t2S, res_t1v, res_t2v)
 total <- total %>% group_by(G) %>% 
   mutate(BH.Pval=p.adjust(Pval, method="BH")) %>%
+  mutate(BH.int.Pval=p.adjust(int.Pval, method="BH")) %>%
   ungroup() %>%
   as.data.frame()
 
-res_t1C <- res_t1C %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
-res_t2C <- res_t2C %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
-res_t3C <- res_t3C %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
-res_t1S <- res_t1S %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
-res_t2S <- res_t2S %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
-res_t1v <- res_t1v %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
-res_t2v <- res_t2v %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+res_t1C <- filter(total, G==1)
+res_t2C <- filter(total, G==2)
+res_t3C <- filter(total, G==3)
+res_t1S <- filter(total, G==4)
+res_t2S <- filter(total, G==5)
+res_t1v <- filter(total, G==6)
+res_t2v <- filter(total, G==7)
+
+# res_t1C <- res_t1C %>% mutate(BH.Pval=p.adjust(Pval, method="BH")) %>%mutate(BH.int.Pval = p.adjust(int.Pval, method="BH"))
+# res_t2C <- res_t2C %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+# res_t3C <- res_t3C %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+# res_t1S <- res_t1S %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+# res_t2S <- res_t2S %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+# res_t1v <- res_t1v %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
+# res_t2v <- res_t2v %>% mutate(BH.Pval=p.adjust(Pval, method="BH"))
 
 saveRDS(total, here("Bangladesh/results/EMM/all_results.RDS"))
 saveRDS(res_t1C, here("Bangladesh/results/EMM/res_t1C.RDS"))
