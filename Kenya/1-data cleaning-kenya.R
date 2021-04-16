@@ -124,11 +124,11 @@ k_phq <- k_phq %>%
                                breaks = quantile(phq_score_t3, probs = seq(0, 1, 0.25)),
                                include.lowest = TRUE,
                                labels = FALSE)) %>%
-  select(childid, phq_quartile_t3)
+  select(childid, phq_quartile_t3, phq_score_t3)
 
 missing <- as.data.frame(missing) %>%
   filter(as.numeric(sum_na) > 1) %>%
-  mutate(phq_quartile_t3 = "Missing") %>%
+  mutate(phq_quartile_t3 = "Missing", phq_score_t3 = NA) %>%
   select(-sum_na)
 
 k_phq <- rbind(k_phq, missing)
