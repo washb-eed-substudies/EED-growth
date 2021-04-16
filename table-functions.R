@@ -190,3 +190,71 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
   flextbl
 }
 
+
+subgroup_tbl <- function(name, expo_var, out_var, sub_var, exposure, outcome, subgroup, results){
+  # build table
+  tbl <- data.table(matrix(nrow=0, ncol=10))
+  skippedexp<-F
+  for (k in 1:length(subgroup)){
+    num.sub <- 0
+    for (i in 1:length(exposure)) {
+      for (j in 1:length(outcome)) {
+        sub <- subgroup[k]
+        exp <- exposure[i]
+        out <- outcome[j]
+        
+        filtered_adj <- results[results$Y==out & results$X==exp & results$V==sub,]
+        v1 <- paste(round(filtered_adj$`point.diff`[1], 2), " (", round(filtered_adj$`lb.diff`[1], 2), ", ", round(filtered_adj$`ub.diff`[1], 2), ")", sep="")
+        v2 <- paste(round(filtered_adj$`point.diff`[2], 2), " (", round(filtered_adj$`lb.diff`[2], 2), ", ", round(filtered_adj$`ub.diff`[2], 2), ")", sep="")
+        
+        if (nrow(filtered_adj)==0){
+          skippedexp<-T
+          next
+        }
+        
+        if((i==1 & j==1)|num.sub==0){
+          s_name <- sub_var[k]
+          num.sub <- num.sub+1
+        }else{
+          s_name <- " "
+          }
+        if(j==1|skippedexp==T){
+          e_name <- expo_var[i]
+          skippedexp <- F
+        }else{
+          e_name <- " "
+          }
+        
+        tbl <- rbind(tbl, list(s_name, e_name, out_var[j], filtered_adj$N[1], round(filtered_adj$Vlevel[1], 2),
+                               v1, round(filtered_adj$Pval[1], 2), round(filtered_adj$BH.Pval[1], 2), "", ""))
+        tbl <- rbind(tbl, list(" ", " ", " ", " ", round(filtered_adj$Vlevel[2], 2), 
+                               v2, round(filtered_adj$Pval[2], 2), round(filtered_adj$BH.Pval[2], 2), 
+                               round(filtered_adj$int.Pval[2], 2), round(filtered_adj$BH.int.Pval[2], 2)))
+      }
+      if (i != length(exposure)) {
+        tbl <- rbind(tbl, as.list(rep("",10)))
+      }
+    }
+    if (k != length(subgroup)){
+      tbl <- rbind(tbl, as.list(rep("",10)))
+    }
+  }
+  
+  flextbl<-flextable(tbl, col_keys=names(tbl))
+  flextbl <- set_header_labels(flextbl,
+                               values = list("V1" = " ", "V2" = " ", "V3" = " ", "V4" = " ",
+                                             "V5" = " ", "V6" = "Coefficient (95% CI)", "V7" = "P-value", "V8" = "FDR Corrected P-value",
+                                             "V9" = "Interaction P-value", "V10" = "FDR Corrected Interaction P-value"))
+  flextbl <- add_header_row(flextbl, values = c("","","","","","Adjusted"), colwidths=c(1,1,1,1,1,5))
+  flextbl <- add_header_row(flextbl, values = c("Effect Modifier", name, "Outcome", "N", "Modifier value", 
+                                                "Outcome, 75th Percentile v. 25th Percentile of Exposure"), colwidths=c(1,1,1,1,1,5))
+  flextbl <- hline(flextbl, part="header", border=fp_border(color="black"))
+  flextbl <- hline_bottom(flextbl, part="body", border=fp_border(color="black"))
+  flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
+  flextbl <- align(flextbl, align = "center", part = "all")
+  flextbl <- align(flextbl, j = c(1, 2, 3), align = "left", part="all")
+  flextbl <- autofit(flextbl, part = "all")
+  flextbl <- fit_to_width(flextbl, max_width=8)
+
+  flextbl
+}
