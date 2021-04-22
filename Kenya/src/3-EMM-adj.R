@@ -2,9 +2,10 @@ rm(list=ls())
 
 source(here::here("0-config.R"))
 
-source(here::here("Kenya/1-data cleaning-Kenya.R"))
+#source(here::here("Kenya/1-data cleaning-Kenya.R"))
 
-# d<-read.csv("C:/Users/Sophia/Downloads/kenya data2.csv")
+d<-read.csv("C:/Users/Sophia/Documents/WASH/EED-Growth/kenya data2.csv")
+d<-d%>%select(-X)
 #remotes::install_github('washb-eed-substudies/washbgam', force = TRUE)
 library(washbgam)
 
