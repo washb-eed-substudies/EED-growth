@@ -1,7 +1,7 @@
 rm(list=ls())
 
 source(here::here("0-config.R"))
-source(here::here("table-functions.R"))
+source(here::here("table-functions_r 4 23.R"))
 
 # load enrollment characteristics and results
 #d <- read.csv(paste0(dropboxDir, ""))
@@ -90,32 +90,39 @@ tbls.word <- function(exp.var = NULL, out.var = NULL, exp.names = NULL, out.name
 
 tbl1 <- tbls.word(exp.var = exp.t1, exp.names = exp.t1.names,
              out.var = c(out.t2, out.t3), out.names = c(out.t2.names, out.t3.names), 
-             tbl.name = "EED markers at 3 months and Subsequent LAZ")
+             tbl.name = "")
 
 tbl2 <- tbls.word(exp.var = exp.t1, exp.names = exp.t1.names,
                          out.var =  c(velo.t1.t2, velo.t1.t3, velo.t2.t3),
                          out.names = c(velo.t1.t2.names, velo.t1.t3.names, velo.t2.t3.names), 
-                         tbl.name = "EED markers at 3 months and Length velocity")
+                         tbl.name = "")
 
 tbl3 <- tbls.word(exp.var = exp.t2, exp.names = exp.t2.names,
                          out.var = out.t3, out.names = out.t3.names, 
-                         tbl.name = "EED markers at 14 months and Subsequent LAZ")
+                         tbl.name = "")
 
 tbl4 <- tbls.word(exp.var = exp.t2, exp.names = exp.t2.names,
-                         out.var = c("len_velocity_t2_t3"), out.names = c("Length velocity 14-28 months"), 
-                         tbl.name = "EED markers at 14 months and Length velocity")
+                         out.var = velo.t2.t3, out.names = velo.t2.t3.names, 
+                         tbl.name = "")
 
 tbl5 <- tbls.word(exp.var = exp.t1, exp.names = exp.t1.names,
                          out.var = out.t1, out.names = out.t1.names, 
-                         tbl.name = "EED markers and concurrent growth")
+                         tbl.name = "")
 
 tbl6 <- tbls.word(exp.var = exp.t2, exp.names = exp.t2.names,
                          out.var = out.t2, out.names = out.t2.names, 
-                         tbl.name = "EED markers and concurrent growth")
+                         tbl.name = "")
 
 tbl7 <- tbls.word(exp.var = exp.t3, exp.names = exp.t3.names,
                          out.var = out.t3, out.names = out.t3.names, 
-                         tbl.name = "EED markers and concurrent growth")
+                         tbl.name = "")
 
-save_as_docx(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6, tbl7, 
-             path = "~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables.docx")
+save_as_docx("EED markers at 3 months and subsequent growth" = tbl1, 
+             "EED markers at 3 months and growth velocity" = tbl2, 
+             "EED markers at 14 months and subsequent growth" = tbl3, 
+             "EED markers at 14 months and growth velocity" = tbl4, 
+             "EED markers and concurrent growth at 3 months" = tbl5, 
+             "EED markers and concurrent growth at 14 months" = tbl6, 
+             "EED markers and concurrent growth at 28 months" = tbl7, 
+             path = "~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables.docx",
+             pr_section = sect_properties)
