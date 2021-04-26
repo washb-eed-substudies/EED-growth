@@ -17,7 +17,7 @@ w.vars <- covariates[c(44:56),1]
 w.vars <- w.vars[-10] #remove floor which has no variation
 
 #timevarying covariates
-time.cov <- covariates[c(1:40),c(2,8:16)]
+time.cov <- covariates[c(1:40),c(2,8:18)]
 
 #obtain unique adjustment sets
 time.cov <- unique(time.cov)
@@ -28,7 +28,7 @@ time.cov <- time.cov %>% na_if("")
 #create adjustment set vectors
 cov.list <- vector('list', nrow(time.cov))
 for(i in 1:length(cov.list)){
-  vec <- as.character(time.cov[i,2:10]) # create vector using row i in columns with variable names
+  vec <- as.character(time.cov[i,2:12]) # create vector using row i in columns with variable names
   vec <- append(vec, w.vars) #add baseline characteristics
   vec <- vec[!is.na(vec)] #remove any NAs (from blank cells)
   cov.list[[i]] <- vec #insert into list item i
@@ -59,8 +59,8 @@ velo.t1.t2 <- c("len_velocity_t1_t2", "wei_velocity_t1_t2", "hc_velocity_t1_t2")
 velo.t1.t3 <- c("len_velocity_t1_t3", "wei_velocity_t1_t3", "hc_velocity_t1_t3")
 velo.t2.t3 <- c("len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3")
 
-V <- c("pss_score", "phq_score_t3")
-d$pss_score <- as.numeric(d$pss_score)
+V <- c("pss_quartile_t3", "phq_score_t3")
+d$pss_quartile_t3 <- as.factor(d$pss_quartile_t3)
 d$phq_score_t3 <- as.numeric(d$phq_score_t3)
 
 ###### Analysis
@@ -71,7 +71,12 @@ gam.analysis <- function(save, Xvar = NULL, Yvar = NULL, W = NULL){
         print(i)
         print(j)
         print(k)
-        res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W = W, V=k)
+        if (k %in% W){
+          Wvar <- W[W != k]
+        } else if (k == "phq_score_t3") {
+          Wvar <- W[W != "phq_quartile_t3"]
+        }
+        res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W = Wvar, V=k)
         res <- data.frame(X=i, Y=j,V=k, int.p =res_adj$int.p, fit=I(list(res_adj$fit)), dat=I(list(res_adj$dat)))
         save <- bind_rows(save, res)
       }
@@ -119,7 +124,15 @@ EMM_models_t2v <- gam.analysis(EMM_models_t2v, Xvar = urine.t2, Yvar = velo.t2.t
 gam.results <- function(models, save){
   for(i in 1:nrow(models)){
     preds <- predict_gam_emm(fit=models$fit[i][[1]], d=models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=models$X[i], Yvar=models$Y[i])
-    gamm_diff_res <- data.frame(V=models$V[i] , preds$res) %>% mutate(int.Pval = c(NA, models$int.p[[i]]))
+    gamm_diff_res <- data.frame(V=models$V[i] , preds$res)
+    if (nrow(gamm_diff_res) == 5){
+      na_rep <- 4
+    } else {
+      na_rep <- 1
+    }
+    gamm_diff_res <- gamm_diff_res %>% 
+      mutate(int.Pval = c(rep(NA, na_rep), models$int.p[[i]])) %>%
+      mutate(Vlevel = as.character(Vlevel))
     save <-  bind_rows(save, gamm_diff_res)
   }
   save
