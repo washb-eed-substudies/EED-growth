@@ -54,13 +54,27 @@ velo.t1.t2 <- c("len_velocity_t1_t2", "wei_velocity_t1_t2", "hc_velocity_t1_t2")
 velo.t1.t3 <- c("len_velocity_t1_t3", "wei_velocity_t1_t3", "hc_velocity_t1_t3")
 velo.t2.t3 <- c("len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3")
 
+outliers <- function(j, data){
+  if (j %in% c("laz_t1", "laz_t2", "laz_t3", "len_velocity_t1_t2", "len_velocity_t2_t3", "len_velocity_t1_t3")){
+    dfunc <- data %>% filter(lhflag != 1)
+  } else if (j %in% c("waz_t1", "waz_t2", "waz_t3", "wei_velocity_t1_t2", "wei_velocity_t2_t3", "wei_velocity_t1_t3")){
+    dfunc <- data %>% filter(weiflag != 1)
+  } else if (j %in% c("hcz_t1", "hcz_t2", "hcz_t3", "hc_velocity_t1_t3","hc_velocity_t2_t3", "hc_velocity_t1_t2")){
+    dfunc <- data %>% filter(hcflag != 1)
+  } else if (j %in% c("whz_t1","whz_t2", "whz_t3")){
+    dfunc <- data %>% filter(whflag != 1)
+  } 
+  return(dfunc)
+}
+
 ###### Analysis
 gam.analysis <- function(Xvar = NULL, Yvar = NULL, data = d, Wvar = NULL){
   for(i in Xvar){
     for(j in Yvar){
       print(i)
       print(j)
-      res_adj <- fit_RE_gam(d=data, X=i, Y=j,  W=Wvar)
+      dfunc <- outliers(j, d)
+      res_adj <- fit_RE_gam(d=dfunc, X=i, Y=j,  W=Wvar)
       res <- data.frame(X=i, Y=j, fit=I(list(res_adj$fit)), dat=I(list(res_adj$dat)))
       all_models <- bind_rows(all_models, res)
     }
@@ -154,228 +168,3 @@ saveRDS(H3_adj_res_BH, here("Bangladesh/results/adjusted/H3_adj_res.RDS"))
 saveRDS(H4_adj_res_BH, here("Bangladesh/results/adjusted/H4_adj_res.RDS"))
 saveRDS(H5_adj_res_BH, here("Bangladesh/results/adjusted/H5_adj_res.RDS"))
 
-
-
-
-
-###### Effect Modification Analysis
-V.set.t1 <- c("life_viol_any_t3")
-V.set.t2 <- c("cesd_sum_t2", "life_viol_any_t3")
-V.set.t3 <- c("pss_sum_mom_t3", "cesd_sum_ee_t3", "life_viol_any_t3")
-V.set.t1.t2 <- c("cesd_sum_t2", "life_viol_any_t3")
-V.set.t2.t3 <- c("pss_sum_mom_t3","cesd_sum_t2", "cesd_sum_ee_t3", "life_viol_any_t3")
-V.set.t1.t3 <- c("pss_sum_mom_t3", "cesd_sum_t2", "cesd_sum_ee_t3", "life_viol_any_t3")
-
-EMM_models <- NULL
-
-#analysis 1
-for(i in urine.t1){
-  for(j in all.growth.t1){
-    for (k in V.set.t1){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset1"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V =res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }
-  }
-}
-
-#analysis 2
-for(i in stool.t1){
-  for(j in all.growth.t1){
-    for (k in V.set.t1){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset2"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }
-  }
-}
-
-#analysis 3
-for(i in stool.t2){
-  for(j in laz.waz.t2){
-    for (k in V.set.t2){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset3"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }
-  }
-}
-
-#analysis 4
-for(i in urine.t2){
-  for(j in laz.waz.t2){
-    for (k in V.set.t2){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset4"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }
-  }
-}
-
-#analysis 5
-for(i in stool.t2){
-  for(j in hcz.t2){
-    for (k in V.set.t2){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset5"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-      }  
-    }
-}
-
-#analysis 6
-for(i in urine.t2){
-  for(j in hcz.t2){
-    for (k in V.set.t2){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset6"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-#analysis 7
-for(i in stool.t2){
-  for(j in whz.t2){
-    for (k in V.set.t2){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset7"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-#analysis 8
-for(i in urine.t2){
-  for(j in whz.t2){
-    for (k in V.set.t2){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset8"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-#analysis 9
-for(i in stool.t3){
-  for(j in laz.waz.t3){
-    for (k in V.set.t3){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset9"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-#analysis 10
-for(i in urine.t3){
-  for(j in laz.waz.t3){
-    for (k in V.set.t3){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset10"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-#analysis 11
-for(i in stool.t3){
-  for(j in hcz.t3){
-    for (k in V.set.t3){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset11"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-#analysis 12
-for(i in urine.t3){
-  for(j in hcz.t3){
-    for (k in V.set.t3){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset12"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-#analysis 13
-for(i in stool.t3){
-  for(j in whz.t3){
-    for (k in V.set.t3){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset13"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-#analysis 14
-for(i in urine.t3){
-  for(j in whz.t3){
-    for (k in V.set.t3){
-      print(i)
-      print(j)
-      print(k)
-      res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=cov.list[["adjset14"]], V = k)
-      res <- data.frame(X=i, Y=j, V=k, V = res_adj$int.p)
-      EMM_models <- bind_rows(EMM_models, res)
-    }  
-  }
-}
-
-all.splits.EMM <- list(NA)
-all.splits.EMM[[1]] <- EMM_models[1:20,]
-all.splits.EMM[[2]] <- EMM_models[21:68,]
-all.splits.EMM[[3]] <- EMM_models[69:128,]
-
-total.EMM <- NA
-for (i in 1:length(all.splits.EMM)) {
-  all.splits.EMM[[i]] <- all.splits.EMM[[i]] %>%
-    mutate(corrected.Pval=p.adjust(V.1, method="BH")) %>%
-    as.data.frame()
-  
-  total.EMM <- rbind(total.EMM, all.splits.EMM[[i]])
-}
-total.EMM <- total.EMM[-1,]
-total.EMM <- total.EMM %>% arrange(corrected.Pval)

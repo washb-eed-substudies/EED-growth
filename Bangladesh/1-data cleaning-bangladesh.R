@@ -16,14 +16,14 @@ library(dplyr)
 library(ggplot2)
 
 #read in dataset
-d <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
+d <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
 
 #join in wealth data (if necessary)
-wealth <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Audrie/hhwealth.csv"))
+wealth <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Audrie/hhwealth.csv"))
 d <- left_join(d, wealth, by = c("dataid"))
 
 #create vector of names of adjustment variables - I am using the original table I made and distilling it down to a vector of unique names, but you can also manually type in all of the covariates that you need
-covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"), na.strings=c(""))
+covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"), na.strings=c(""))
 
 baseline.cov <- covariates[c(44:58),1]
 baseline.cov <- baseline.cov[!is.na(baseline.cov)]
@@ -107,7 +107,8 @@ d <- d %>% select(-roof)
 w.vars <- w.vars[-which(w.vars == "roof")]
 
 ####growth vars
-growth.var <- grep("z_", names(d2), value = "TRUE")
+growth.var <- grep("z_", names(d), value = "TRUE")
+growth.var <- growth.var[!(growth.var %in% grep("delta_", names(d), value = "TRUE"))]
 
 #check distributions
 #plots <- vector("list")
@@ -158,3 +159,28 @@ for (i in 1:nrow(miss)) {
   miss$class[i] <- class(d2[,which(colnames(d2) == miss[i, 1])])
 }
 
+#flag growth outliers/errors
+d <- d %>% 
+  mutate(hcflag = ifelse(childid %in% c(001041,
+                                        023061,
+                                        037071,
+                                        050051,
+                                        053031,
+                                        068051,
+                                        069081,
+                                        143071,
+                                        179061,
+                                        184041,
+                                        235071,
+                                        330041,
+                                        271011), 1, 0),
+         lhflag = ifelse(childid %in% c(010081,
+                                        013031,
+                                        155031), 1, 0),
+         weiflag = ifelse(childid %in% c(143071,
+                                         101031,
+                                         155031,
+                                         348071,
+                                         404071,
+                                         408021), 1, 0),
+         whflag = ifelse(lhflag == 1 | weiflag == 1, 1, 0))
