@@ -124,5 +124,5 @@ save_as_docx("EED markers at 3 months and subsequent growth" = tbl1,
              "EED markers and concurrent growth at 3 months" = tbl5, 
              "EED markers and concurrent growth at 14 months" = tbl6, 
              "EED markers and concurrent growth at 28 months" = tbl7, 
-             path = "~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables.docx",
+             path = "~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables 9 30.docx",
              pr_section = sect_properties)
