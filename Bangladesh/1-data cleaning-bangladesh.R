@@ -16,14 +16,14 @@ library(dplyr)
 library(ggplot2)
 
 #read in dataset
-d <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
+d <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/bangladesh-dm-ee-ee-growth-stool-urine-lab-covariates-anthro.csv"))
 
 #join in wealth data (if necessary)
-wealth <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Audrie/hhwealth.csv"))
+wealth <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Audrie/hhwealth.csv"))
 d <- left_join(d, wealth, by = c("dataid"))
 
 #create vector of names of adjustment variables - I am using the original table I made and distilling it down to a vector of unique names, but you can also manually type in all of the covariates that you need
-covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"), na.strings=c(""))
+covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"), na.strings=c(""))
 
 baseline.cov <- covariates[c(44:58),1]
 baseline.cov <- baseline.cov[!is.na(baseline.cov)]
@@ -67,7 +67,8 @@ d <- d %>%
 
 #Z-score momheight and turn into a factor variable
 d <- d %>%
-  mutate(momheight = scale(momheight, center = TRUE, scale = TRUE),
+  mutate(momheight_cont = momheight,
+         momheight = scale(momheight, center = TRUE, scale = TRUE),
          momheight = cut(momheight, 
                          c(min(momheight, na.rm = T), -2, -1, 0, 1, 2, max(momheight, na.rm = T)),
                         right = FALSE,
