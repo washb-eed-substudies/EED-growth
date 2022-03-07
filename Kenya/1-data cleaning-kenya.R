@@ -19,6 +19,7 @@ library(haven)
 
 #read in datasets
 #primary dataset
+allkids <- readRDS(file=paste0(dropboxDir, "WBK-EE-analysis/Data/Cleaned/Andrew/WBK-EE-covariates.RDS"))
 allkids <- read.csv(file = paste0(dropboxDir, "WASHB-Kenya-Data/1-primary-outcome-datasets/washb-kenya-enrol.csv"))
 allkids$sex[allkids$sex == "Male"] <- "1"
 allkids$sex <- as.numeric(allkids$sex)

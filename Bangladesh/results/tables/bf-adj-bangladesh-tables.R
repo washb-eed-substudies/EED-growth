@@ -83,7 +83,7 @@ tbls.word <- function(exp.var = NULL, out.var = NULL, exp.names = NULL, out.name
   out_var <- out.names
   
   comb.table <- growth_tbl_flex(tbl.name, expo_var, out_var, exposure, outcome, 
-                                all_unadj, all_adj, F)
+                                all_unadj, all_adj, T)
   return(comb.table)
 }
 
@@ -123,6 +123,6 @@ save_as_docx("EED markers at 3 months and subsequent growth" = tbl1,
              "EED markers and concurrent growth at 3 months" = tbl5, 
              "EED markers and concurrent growth at 14 months" = tbl6, 
              "EED markers and concurrent growth at 28 months" = tbl7, 
-             path="~/Users/sophiatan/Documents/WASH/EED-growth-bd-bf-sensitivity-tables.docx",
+             path="/Users/sophiatan/Documents/WASH/EED-growth-bd-bf-sensitivity-tables.docx",
              # path = "~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables 9 30.docx",
              pr_section = sect_properties)
