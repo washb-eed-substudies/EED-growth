@@ -74,7 +74,7 @@ tbl2 <- rbind(tbl2, tbls(exp.var = exp.t3, exp.names = exp.t3.names,
 
 
 #### SAVE TABLES ####
-write.csv(tbl2, file="~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables.csv")
+write.csv(tbl2, file="~/Documents/WASH/EED and growth/EED-Growth tables.csv")
 
 ##word doc
 tbls.word <- function(exp.var = NULL, out.var = NULL, exp.names = NULL, out.names = NULL, tbl.name = NULL){
@@ -124,5 +124,5 @@ save_as_docx("EED markers at 3 months and subsequent growth" = tbl1,
              "EED markers and concurrent growth at 3 months" = tbl5, 
              "EED markers and concurrent growth at 14 months" = tbl6, 
              "EED markers and concurrent growth at 28 months" = tbl7, 
-             path = "~/Documents/WASH Benefits/Secondary analysis papers/EED and growth/Tables/EED-Growth tables 9 30.docx",
+             path = "~/Documents/WASH/EED and growth/EED-Growth tables.docx",
              pr_section = sect_properties)

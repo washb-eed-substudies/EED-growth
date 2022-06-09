@@ -1,11 +1,13 @@
 rm(list=ls())
 
-source(here::here("Bangladesh/1-data cleaning-Bangladesh.R"))
+source(here::here("0-config.R"))
+d <- readRDS("/Users/sophiatan/Library/CloudStorage/Box-Box/washb/Bangladesh/Master Dataset/bangladesh-cleaned-master-data.RDS")
+#source(here::here("Bangladesh/1-data cleaning-Bangladesh.R"))
 #remotes::install_github('washb-eed-substudies/washbgam', force = TRUE)
 library(washbgam)
 
-library(boxr)
-box_auth()
+# library(boxr)
+# box_auth()
 # add bf data
 bf_bl <- box_read(911203148027)
 bf_ml <- box_read(911203591841)
@@ -99,7 +101,7 @@ add_bf <- function(x, y, W){
 
 outliers <- function(j, data){
   if (j %in% c("laz_t1", "laz_t2", "laz_t3", "len_velocity_t1_t2", "len_velocity_t2_t3", "len_velocity_t1_t3")){
-    dfunc <- data %>% filter(lhflag != 1)
+    dfunc <- data %>% filter(lenflag != 1)
   } else if (j %in% c("waz_t1", "waz_t2", "waz_t3", "wei_velocity_t1_t2", "wei_velocity_t2_t3", "wei_velocity_t1_t3")){
     dfunc <- data %>% filter(weiflag != 1)
   } else if (j %in% c("hcz_t1", "hcz_t2", "hcz_t3", "hc_velocity_t1_t3","hc_velocity_t2_t3", "hc_velocity_t1_t2")){
