@@ -22,8 +22,8 @@ library(mgcv)
 #library(psych)
 
 dropboxDir <- NULL
-if(dir.exists("C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/")){ 
-  dropboxDir <- "C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/"
+if(dir.exists("C:/Users/andre/Dropbox/WASHB-EE-analysis/")){ 
+  dropboxDir <- "C:/Users/andre/Dropbox/WASHB-EE-analysis/WBK-EE-analysis/"
 }
 if(dir.exists("/Users/audrielin/Dropbox/WBB-EE-analysis/")){ 
   dropboxDir <- "/Users/audrielin/Dropbox/WBB-EE-analysis/"

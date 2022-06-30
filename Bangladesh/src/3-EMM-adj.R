@@ -6,6 +6,7 @@ library(washbgam)
 
 stress<-readRDS(paste0(dropboxDir, "Data/Cleaned/Andrew/stress_growth_data.RDS"))
 stress<- stress %>% select(childid, grep("t2_f2", names(stress)), t2_iso_pca, grep("cort", names(stress)))
+stress<- stress %>% select(childid, grep("t2_f2", names(stress)), grep("cort", names(stress)))
 d<-d %>% left_join(stress, by="childid")
 
 maternal<-read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/washb-bd-pregnancy-serum-micronutrient-immun-cortisol-covariates.csv")) %>%
@@ -19,7 +20,8 @@ d$life_viol_any_t3 <- as.numeric(levels(d$life_viol_any_t3))[d$life_viol_any_t3]
 d$pss_sum_dad_t3 <- as.numeric(d$pss_sum_dad_t3)
 
 #Make vectors of adjustment variable names
-covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv"))
+try(covariates <- read.csv(file = paste0(dropboxDir, "WBB-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv")))
+try(covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Bangladesh.csv")))
 
 #baseline covariates
 w.vars <- covariates[c(44:58),1]

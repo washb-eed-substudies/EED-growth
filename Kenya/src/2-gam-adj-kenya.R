@@ -7,6 +7,8 @@ library(washbgam)
 #Make vectors of adjustment variable names
 covariates <- read.csv(file = paste0(dropboxDir, "WBK-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Kenya.csv"))
 
+colnames(covariates)
+
 #baseline covariates
 w.vars <- covariates[c(44:56),1]
 w.vars <- w.vars[-10] #remove floor which has no variation

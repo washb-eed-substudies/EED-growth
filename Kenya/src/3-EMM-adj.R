@@ -2,14 +2,16 @@ rm(list=ls())
 
 source(here::here("0-config.R"))
 
-source(here::here("Kenya/1-data cleaning-Kenya.R"))
+#source(here::here("Kenya/1-data cleaning-Kenya.R"))
 
-# d<-read.csv("C:/Users/Sophia/Downloads/kenya data2.csv")
+d <-  dfull <- read.csv("C:/Users/andre/Downloads/kenya data2.csv")
+d <- d %>% subset(., select = -X)
+
 #remotes::install_github('washb-eed-substudies/washbgam', force = TRUE)
 library(washbgam)
 
 #Make vectors of adjustment variable names
-covariates <- read.csv(file = paste0(dropboxDir, "WBK-EE-analysis/Data/Cleaned/Caitlin/EED-Growth Covariates - Kenya.csv"))
+covariates <- read.csv(file = paste0(dropboxDir, "Data/Cleaned/Caitlin/EED-Growth Covariates - Kenya.csv"))
 
 #baseline covariates
 w.vars <- covariates[c(44:56),1]
@@ -84,6 +86,22 @@ EMM_models_t1S <- NULL
 EMM_models_t2S <- NULL
 EMM_models_t1v <- NULL
 EMM_models_t2v <- NULL
+
+
+df <- d %>% subset(., select=c("laz_t3","ln_mpo3",cov.list[["adjset9"]]))
+res <- glm(laz_t3~., data=df)
+summary(res)
+
+i<-1
+models1 <- fit_RE_gam(d=d, X=stool.t3[1], Y=laz.waz.t3[1],  W = cov.list[["adjset9"]])
+preds1 <- predict_gam_diff(fit=models1$fit, d=models1$dat, quantile_diff=c(0.25,0.75), Xvar=stool.t3[1], Yvar=laz.waz.t3[1])
+preds1$res
+
+models <-  fit_RE_gam(d=d, X=stool.t3[1], Y=laz.waz.t3[1],  W = cov.list[["adjset9"]], V="pss_score")
+preds2 <- predict_gam_emm(fit=models$fit, d=models$dat, quantile_diff=c(0.25,0.75), Xvar=stool.t3[1], Yvar=laz.waz.t3[1])
+preds2$res
+gamm_diff_res <- data.frame(V=models$V[i] , preds$res) %>% mutate(int.Pval = c(NA, models$int.p[[i]]))
+save <-  bind_rows(save, gamm_diff_res)
 
 #analysis numbers are from covariates spreadsheet
 EMM_models_t3C <- gam.analysis(EMM_models_t3C, Xvar = stool.t3, Yvar = laz.waz.t3, W = cov.list[["adjset9"]]) #9
