@@ -1,14 +1,30 @@
 rm(list=ls())
-
-source(here::here("Bangladesh/1-data cleaning-bangladesh.R"))
+source(here::here("0-config.R"))
+d <- readRDS("/Users/sophiatan/Library/CloudStorage/Box-Box/washb/Bangladesh/Master Dataset/bangladesh-cleaned-master-data.RDS")
+#source(here::here("Bangladesh/1-data cleaning-bangladesh.R"))
 library(washbgam)
 
+outliers <- function(j, data){
+  if (j %in% c("laz_t1", "laz_t2", "laz_t3", "len_velocity_t1_t2", "len_velocity_t2_t3", "len_velocity_t1_t3")){
+    dfunc <- data %>% filter(lenflag != 1)
+  } else if (j %in% c("waz_t1", "waz_t2", "waz_t3", "wei_velocity_t1_t2", "wei_velocity_t2_t3", "wei_velocity_t1_t3")){
+    dfunc <- data %>% filter(weiflag != 1)
+  } else if (j %in% c("hcz_t1", "hcz_t2", "hcz_t3", "hc_velocity_t1_t3","hc_velocity_t2_t3", "hc_velocity_t1_t2")){
+    dfunc <- data %>% filter(hcflag != 1)
+  } else if (j %in% c("whz_t1","whz_t2", "whz_t3")){
+    dfunc <- data %>% filter(whflag != 1)
+  } 
+  return(dfunc)
+}
+
+###### Analysis
 gam.analysis <- function(Xvar = NULL, Yvar = NULL, data = d, Wvar = NULL){
   for(i in Xvar){
     for(j in Yvar){
       print(i)
       print(j)
-      res_adj <- fit_RE_gam(d=data, X=i, Y=j,  W=Wvar)
+      dfunc <- outliers(j, d)
+      res_adj <- fit_RE_gam(d=dfunc, X=i, Y=j,  W=Wvar)
       res <- data.frame(X=i, Y=j, fit=I(list(res_adj$fit)), dat=I(list(res_adj$dat)))
       all_models <- bind_rows(all_models, res)
     }

@@ -1,7 +1,7 @@
 rm(list=ls())
 
 source(here::here("0-config.R"))
-source(here::here("table-functions.R"))
+source(here::here("table-functions_R 4 23.R"))
 
 # load enrollment characteristics and results
 #d <- read.csv(paste0(dropboxDir, ""))
@@ -33,7 +33,7 @@ velo.t1.t2.names <- c("Length velocity 6-17 months", "Weight velocity 6-17 month
 velo.t1.t3.names <- c("Length velocity 6-22 months", "Weight velocity 6-22 months", "HC velocity 6-22 months")
 velo.t2.t3.names <- c("Length velocity 17-22 months", "Weight velocity 17-22 months", "HC velocity 17-22 months")
 
-sub <- c("pss_score", "phq_score_t3")
+sub <- c("pss_quartile_t3", "phq_score_t3")
 sub.names <- c("Maternal stress", "Maternal depression")
 
 
@@ -48,4 +48,5 @@ save_as_docx("Table 1: Effect modification of EED at 6 months and growth velocit
              "Table 2: Effect modification of EED at 17 months and growth at 22 months" = tbl2,
              "Table 3: Effect modification of EED at 17 months and growth velocity" = tbl3,
              "Table 4: Effect modification of EED and growth at 22 months" = tbl4,
-             path = "C:/Users/Sophia/Documents/WASH/EED-Growth/kenya-emm-tables.docx")
+             path = "C:/Users/Sophia/Documents/WASH/EED-Growth/kenya-emm-tables v2.docx",
+             pr_section = sect_properties)

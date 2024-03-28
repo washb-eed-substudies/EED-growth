@@ -4,7 +4,8 @@ source(here::here("0-config.R"))
 library(dplyr)
 
 kenya <- read.csv(file = paste0(dropboxDir, "WASHB-Kenya-Data/1-primary-outcome-datasets/washb-kenya-enrol.csv"))
-  
+try(kenya <- read.csv(file = "C:/Users/andre//Dropbox/AB use/data/input/washb-kenya-enrol.csv"))
+
 assets <- kenya %>%
   select(childid, hhid, clusterid, cow, goat, chicken, dog,
          floor, roof, wall,
